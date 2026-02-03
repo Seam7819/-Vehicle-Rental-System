@@ -1,40 +1,29 @@
-import { pool } from "../../config/db";
-import { hashPassword, comparePassword } from "../../utils/password";
-import { generateToken } from "../../utils/jwt";
+import { pool } from '../../config/db';
+import { hashPassword, comparePassword } from '../../utils/bcrypt';
+import { generateToken } from '../../utils/jwt';
 
-export const AuthService = {
-  async signup(data) {
-    const hashed = await hashPassword(data.password);
-    const result = await pool.query(
-      `INSERT INTO users (name,email,password,phone,role)
-       VALUES ($1,$2,$3,$4,$5)
-       RETURNING id,name,email,phone,role`,
-      [data.name, data.email.toLowerCase(), hashed, data.phone, data.role]
-    );
-    return result.rows[0];
-  },
+export const signup = async (data: any) => {
+  const hashed = await hashPassword(data.password);
+  const result = await pool.query(
+    `INSERT INTO users(name,email,password,phone,role)
+     VALUES($1,$2,$3,$4,'customer') RETURNING id,role`,
+    [data.name, data.email, hashed, data.phone]
+  );
+  return result.rows[0];
+};
 
-  async signin(data) {
-    const result = await pool.query(
-      `SELECT * FROM users WHERE email=$1`,
-      [data.email.toLowerCase()]
-    );
+export const signin = async (email: string, password: string) => {
+  const user = await pool.query(
+    'SELECT * FROM users WHERE email=$1',
+    [email]
+  );
+  if (!user.rows.length) throw new Error('Invalid credentials');
 
-    if (!result.rows.length) throw new Error("Invalid credentials");
+  const valid = await comparePassword(password, user.rows[0].password);
+  if (!valid) throw new Error('Invalid credentials');
 
-    const user = result.rows[0];
-    const valid = await comparePassword(data.password, user.password);
-    if (!valid) throw new Error("Invalid credentials");
-
-    return {
-      token: generateToken({ id: user.id, role: user.role }),
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-    };
-  },
+  return generateToken({
+    id: user.rows[0].id,
+    role: user.rows[0].role,
+  });
 };

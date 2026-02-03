@@ -1,8 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from 'express';
 
 export const authorize =
-    (...roles: string[]) =>
-        (req: Request, res: Response, next: NextFunction) =>
-            roles.includes(req.user.role)
-                ? next()
-                : res.status(403).json({ success: false, message: "Forbidden" });
+  (...roles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    next();
+  };

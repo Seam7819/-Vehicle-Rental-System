@@ -1,5 +1,8 @@
-import { Pool } from "pg";
+import { Pool } from 'pg';
+import config from './index';
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+export const pool = new Pool(config.db);
+
+pool.on('connect', () => {
+  console.log('✅ PostgreSQL connected');
 });

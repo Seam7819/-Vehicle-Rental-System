@@ -1,19 +1,15 @@
-import express from "express";
-import dotenv from "dotenv";
+import express from 'express';
+import authRoutes from './modules/authentication/auth.routes';
+import userRoutes from './modules/customers/customers.route';
+import vehicleRoutes from './modules/vehicles/vehicle.route';
+import bookingRoutes from './modules/bookings/booking.route';
 
-import authRoutes from "./modules/authentication/auth.routes";
-import vehicleRoutes from "./modules/vehicles/vehicle.routes";
-import userRoutes from "./modules/customers/user.routes";
-import bookingRoutes from "./modules/bookings/booking.routes";
-
-dotenv.config();
 const app = express();
-
 app.use(express.json());
 
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/vehicles", vehicleRoutes);
-app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/bookings", bookingRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/vehicles', vehicleRoutes);
+app.use('/api/v1/bookings', bookingRoutes);
 
 export default app;

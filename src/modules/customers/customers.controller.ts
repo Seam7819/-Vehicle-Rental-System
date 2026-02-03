@@ -1,17 +1,21 @@
-import { Request, Response } from "express";
-import * as UserService from "./customers.service";
+import { Request, Response } from 'express';
+import * as UserService from './customers.service';
 
-export const getAllUsers = async (_req:Request, res:Response) => {
-  const users = await UserService.getUsers();
-  res.json({ success: true, data: users });
+export const getAll = async (_: Request, res: Response) => {
+  const users = await UserService.getAllUsers();
+  res.json(users);
 };
 
-export const updateUser = async (req:Request, res:Response) => {
-  const user = await UserService.updateUser(req.params.userId as string, req.body);
-  res.json({ success: true, message: "User updated", data: user });
+export const update = async (req: Request, res: Response) => {
+  const updated = await UserService.updateUser(
+    Number(req.params.userId),
+    req.body,
+    req.user
+  );
+  res.json(updated);
 };
 
-export const removeUser = async (req:Request, res:Response) => {
-  await UserService.deleteUser(req.params.userId as string);
-  res.json({ success: true, message: "User deleted" });
+export const remove = async (req: Request, res: Response) => {
+  await UserService.deleteUser(Number(req.params.userId));
+  res.json({ message: 'User deleted successfully' });
 };
